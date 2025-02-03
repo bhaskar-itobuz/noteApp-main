@@ -1,0 +1,16 @@
+services:
+  # MongoDB Service
+  mongo_db:
+    container_name: db_container
+    image: mongo:latest
+    ports:
+      - "4006:27017"
+    volumes:
+      - mongo_data:/data/db
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root  # Username
+      MONGO_INITDB_ROOT_PASSWORD: example  # Password
+
+volumes:
+  mongo_data:
