@@ -221,16 +221,16 @@ export const sortbyQuery = async (req, res) => {
         const ans = await userSchema.findOne({ _id: id });
         const loginCheck = await sessionSchema.findOne({ userId: id });
         if (ans && loginCheck) {
-          const sortBy = req.query.sortBy || "timestamps"; // Default to 'timestamps' if not provided
-          const sortOrder = req.query.sortOrder === "desc" ? -1 : 1; // Set sort order based on query param
+          const sortBy = req.query.sortBy || "timestamps"; 
+          const sortOrder = req.query.sortOrder === "desc" ? -1 : 1; 
           const pageNo = req.query.pageNo || 1;
           const searchbyTitle = req.query.searchbyTitle || "";
-          const sortCriteria = { [sortBy]: sortOrder }; // Dynamically create sort object
+          const sortCriteria = { [sortBy]: sortOrder }; 
           const users = await noteSchema
             .find({ userId: id, title: { $regex: "^" + searchbyTitle } })
             .sort(sortCriteria)
             .skip((pageNo - 1) * 3)
-            .limit(3); // Apply sort to query
+            .limit(3); 
           if (users.length > 0) {
             res.json({
               status: 200,

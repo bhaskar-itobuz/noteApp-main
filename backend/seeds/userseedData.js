@@ -2,9 +2,12 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { faker } from "@faker-js/faker";
 import userSchema from "../model/userSchema.js";
+// eslint-disable-next-line no-unused-vars
+import dotenv from 'dotenv/config';
+const url = process.env.url;
 
 mongoose
-  .connect("mongodb://root:example@localhost:4006/note-app?authSource=admin")
+  .connect(url)
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
 const generateFakeUser = async () => {

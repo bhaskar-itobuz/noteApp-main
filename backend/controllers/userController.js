@@ -22,8 +22,8 @@ function getBearerToken(req) {
 export const createData = async (req, res) => {
   try {
     const { email, userName, password } = req.body;
-    const ans = await userSchema.findOne({ $or: [{ email: email }] });
-    if (ans) {
+    const ans = await userSchema.find({ email: email ,verify : true });
+    if (ans.length>=1) {
       res.json({
         status: 404,
         message: " email is already found",
@@ -126,10 +126,11 @@ export const verifyData = async (req, res) => {
 export const checkLogin = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const ans = await userSchema.findOne({ email: email });
-    if (ans && ans.verify === true) {
-      const userId = ans._id;
-      bcrypt.compare(password, ans.password, async function (err, result) {
+    const ans = await userSchema.find({ email: email ,verify : true});
+    console.log(ans);
+    if (ans.length>=1) {
+      const userId = ans[0]._id;
+      bcrypt.compare(password, ans[0].password, async function (err, result) {
         if (err) throw err;
 
         if (result === true) {
