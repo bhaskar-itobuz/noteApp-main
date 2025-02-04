@@ -1,9 +1,7 @@
-/* eslint-disable */
 import noteSchema from "../model/noteSchema.js";
 import userSchema from "../model/userSchema.js";
 import sessionSchema from "../model/sessionSchema.js";
 import jwt from "jsonwebtoken";
-import { ESLint } from "eslint";
 
 function getBearerToken(req) {
   const authorizationHeader = req.headers["authorization"];
@@ -75,7 +73,7 @@ export const updateData = async (req, res) => {
         console.log(findId);
         if (findId && ans && loginCheck) {
           console.log("hi");
-          const user = await noteSchema.findByIdAndUpdate(noteId, {
+          await noteSchema.findByIdAndUpdate(noteId, {
             title,
             content,
           });
@@ -115,11 +113,11 @@ export const deleteData = async (req, res) => {
         const loginCheck = await sessionSchema.findOne({ userId: id });
         if (findId && ans && loginCheck) {
           console.log("hi");
-          const user = await noteSchema.findByIdAndDelete(noteId);
+          await noteSchema.findByIdAndDelete(noteId);
           res.json({
             status: 200,
             message: "Delete sucessfully",
-          });
+          });          
         } else {
           res.json({
             status: 404,
@@ -221,16 +219,16 @@ export const sortbyQuery = async (req, res) => {
         const ans = await userSchema.findOne({ _id: id });
         const loginCheck = await sessionSchema.findOne({ userId: id });
         if (ans && loginCheck) {
-          const sortBy = req.query.sortBy || "timestamps"; 
-          const sortOrder = req.query.sortOrder === "desc" ? -1 : 1; 
+          const sortBy = req.query.sortBy || "timestamps";
+          const sortOrder = req.query.sortOrder === "desc" ? -1 : 1;
           const pageNo = req.query.pageNo || 1;
           const searchbyTitle = req.query.searchbyTitle || "";
-          const sortCriteria = { [sortBy]: sortOrder }; 
+          const sortCriteria = { [sortBy]: sortOrder };
           const users = await noteSchema
             .find({ userId: id, title: { $regex: "^" + searchbyTitle } })
             .sort(sortCriteria)
             .skip((pageNo - 1) * 3)
-            .limit(3); 
+            .limit(3);
           if (users.length > 0) {
             res.json({
               status: 200,

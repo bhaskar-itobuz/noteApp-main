@@ -2,8 +2,6 @@ import mongoose from "mongoose";
 import { faker } from "@faker-js/faker";
 import noteSchema from "../model/noteSchema.js";
 import userSchema from "../model/userSchema.js";
-// eslint-disable-next-line no-unused-vars
-import dotenv from 'dotenv/config';
 const url = process.env.url;
 
 mongoose
@@ -39,6 +37,7 @@ export const seedNotesDatabase = async (req, res) => {
     await noteSchema.insertMany(fakeNotes);
     res.send(fakeNotes);
     console.log("Seed data inserted!");
+    mongoose.disconnect();
   } catch (error) {
     console.error("Error seeding database:", error);
     res.status(500).send("Error seeding notes database");

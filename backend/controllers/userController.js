@@ -1,4 +1,4 @@
-/* eslint-disable */
+
 import userSchema from "../model/userSchema.js";
 import sessionSchema from "../model/sessionSchema.js";
 import jwt from "jsonwebtoken";
@@ -73,7 +73,7 @@ export const createData = async (req, res) => {
                 token: token,
             }
         };
-        transporter.sendMail(mailConfigurations, function (error, info) {
+        transporter.sendMail(mailConfigurations, function (error) {
           if (error) throw Error(error);
           console.log("Email Sent Successfully");
         });
