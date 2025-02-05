@@ -1,13 +1,19 @@
-import RegisterForm from "./Components/signUp.jsx";
-// import { RegisterForm } from "./Components/signUp.jsx";
-// import { SignUp } from "./Components/signUp.jsx";
-function App() {
 
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { LogIn } from "./pages/Login";
+
+import { RegistrationForm } from "./pages/SignUp";
+
+const App = () => {
   return (
     <>
-      <RegisterForm />
+      <Routes>
+        <Route path="/login" element={<LogIn />} />
+        <Route path="/register" element={<RegistrationForm />} />
+      </Routes>
     </>
-  )
-}
+  );
+};
 
 export default App

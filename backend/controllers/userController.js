@@ -22,8 +22,8 @@ function getBearerToken(req) {
 export const createData = async (req, res) => {
   try {
     const { email, userName, password } = req.body;
-    const ans = await userSchema.find({ email: email ,verify : true });
-    if (ans.length>=1) {
+    const ans = await userSchema.findOne({ email: email  });
+    if (ans) {
       res.json({
         status: 404,
         message: " email is already found",

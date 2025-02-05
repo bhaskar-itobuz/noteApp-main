@@ -1,17 +1,15 @@
 import express from "express";
-// import routes from '../backend/routes/userRoute.js'
 import routes  from "./routes/userRoute.js";
 import routeNote from "./routes/noteRoute.js";
-// eslint-disable-next-line no-unused-vars
-import dotenv from 'dotenv/config';
 import { dbConnection } from "./config/dbConnection.js";
+import cors from "cors";
 
 const app = express();
 const port = process.env.port; 
-
+app.use(cors());
 app.use(express.json());
-app.use("/note", routes);
-app.use("/noteop",routeNote);
+app.use("/user", routes);
+app.use("/note",routeNote);
 app.use('/uploads',express.static('uploads'));
 
 app.listen(port, () => {
