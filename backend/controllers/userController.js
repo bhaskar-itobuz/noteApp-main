@@ -127,9 +127,9 @@ export const checkLogin = async (req, res) => {
   const { email, password } = req.body;
   try {
     const ans = await userSchema.find({ email: email ,verify : true});
-    console.log(ans);
     if (ans.length>=1) {
       const userId = ans[0]._id;
+      const name = ans[0].userName;
       bcrypt.compare(password, ans[0].password, async function (err, result) {
         if (err) throw err;
 
@@ -157,6 +157,7 @@ export const checkLogin = async (req, res) => {
           res.json({
             status: 200,
             message: " valid user",
+            name,
             token,
             refreshToken,
           });
