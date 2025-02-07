@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -7,7 +8,7 @@ import { Link } from 'react-router-dom';
 import axios from "axios";
 
 export const RegistrationForm = () => {
-
+    let navigate = useNavigate();
     const {
         reset,
         register,
@@ -16,28 +17,27 @@ export const RegistrationForm = () => {
     } = useForm({
         resolver: zodResolver(registrationSchema),
     });
-    const notify = () => {
-        // Calling toast method by passing string
-        toast("Hello Geeks");
-    };
     const onSubmit = async (data) => {
         const payload = {
             email: data.email,
             userName: data.name,
             password: data.password,
         }
-        await axios({
-            method: 'post',
-            url: 'http://localhost:3000/user/create',
-            data: payload,
-
-        }).then(function (response) {
-            const mesg = response.data.message;
-            const notify = () => toast(mesg);
-            console.log(response.data.message);
-        }).catch(function (error) {
-            console.log(error);
-        });
+        try {
+            const response = await axios.post('http://localhost:3000/user/create', payload);
+            if (response.data.message === "sucess") {
+                toast.success("Registration successful!");
+                console.log(response.data);
+                navigate('/login');
+            }
+            else {
+                toast.error(response.data.message);
+                console.log(response.data);
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Registration failed!");
+            console.error(error);
+        }
 
         reset({
             email: "",
@@ -56,35 +56,47 @@ export const RegistrationForm = () => {
                         <div>
                             <label className="block font-medium">Name:</label>
                             <input type="text" {...register("name")} className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-400" />
-                            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+                            <p className={`text-red-500 text-sm mt-1 min-h-[20px] ${errors.name ? "visible" : "invisible"}`}>
+                                {errors.name?.message}
+                            </p>
+
                         </div>
 
                         <div>
                             <label className="block font-medium">Email:</label>
                             <input type="email" {...register("email")} className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-400" />
-                            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+                            <p className={`text-red-500 text-sm mt-1 min-h-[20px] ${errors.email ? "visible" : "invisible"}`}>
+                                {errors.email?.message}
+                            </p>
+
                         </div>
 
                         <div>
                             <label className="block font-medium">Password:</label>
                             <input type="password" {...register("password")} className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-400" />
-                            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+                            <p className={`text-red-500 text-sm mt-1 min-h-[20px] ${errors.password ? "visible" : "invisible"}`}>
+                                {errors.password?.message}
+                            </p>
+
                         </div>
                         <div>
                             <label className="block font-medium">Confirm Password:</label>
                             <input type="password" {...register("confirmPassword")} className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-400" />
-                            {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>}
+                            <p className={`text-red-500 text-sm mt-1 min-h-[20px] ${errors.confirmPassword ? "visible" : "invisible"}`}>
+                                {errors.confirmPassword?.message}
+                            </p>
+
                         </div>
 
-                        <button type="submit" onClick={notify} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition">
+                        <button type="submit"  className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition">
                             Register
                         </button>
                         <p className="text-center mt-4 text-gray-600">
                             Already have an account? <Link to="/login" className="text-blue-500 hover:underline">Login </Link>
                         </p>
                     </form>
-                </div>
-            </div>
+                </div >
+            </div >
         </>
     );
 };

@@ -1,31 +1,39 @@
+import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../validation/validationSchema";
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 import axios from "axios";
 
-
 export const LogIn = () => {
-    const { reset,register, handleSubmit, formState: { errors }, } = useForm({
+    const { reset, register, handleSubmit, formState: { errors }, } = useForm({
         resolver: zodResolver(loginSchema),
     });
-    const onSubmit = async(data) => {
+    let navigate = useNavigate();
+    const onSubmit = async (data) => {
         const payload = {
-            email : data.email,
+            email: data.email,
             password: data.password,
-          }
-         await axios({
-            method: 'post',
-            url: 'http://localhost:3000/user/check',
-            data: payload, 
-    
-        }).then(function(response) {
-            console.log(response);
-        }).catch(function (error){
-            console.log(error);});
-        
-        reset({email: "",
+        }
+        try {
+            const response = await axios.post('http://localhost:3000/user/check', payload);
+            if (response.data.message === " valid user") {
+                toast.success("Login successful!");
+                console.log(response.data);
+                localStorage.setItem('user', JSON.stringify(response.data));
+                navigate('/notepage');
+            }
+            else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Login failed!");
+            console.error(error);
+        }
+        reset({
+            email: "",
             password: "",
         });
     }
@@ -39,13 +47,17 @@ export const LogIn = () => {
                         <div>
                             <label className="block font-medium">Email:</label>
                             <input type="email" {...register("email")} className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-400" />
-                            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+                            <p className={`text-red-500 text-sm mt-1 min-h-[20px] ${errors.email ? "visible" : "invisible"}`}>
+                                {errors.email?.message}
+                            </p>
                         </div>
 
                         <div>
                             <label className="block font-medium">Password:</label>
                             <input type="password" {...register("password")} className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-400" />
-                            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+                            <p className={`text-red-500 text-sm mt-1 min-h-[20px] ${errors.password ? "visible" : "invisible"}`}>
+                                {errors.password?.message}
+                            </p>
                         </div>
                         <button type="submit" className="w-full mt-5 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition">Submit</button>
                         <p className="text-center mt-4 text-gray-600">
