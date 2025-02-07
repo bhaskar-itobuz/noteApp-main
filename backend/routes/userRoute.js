@@ -21,7 +21,7 @@ route.post('/upload', checkUserVerification, upload.single('fileName'), async (r
     }
 
     req.user.fileName = "http://localhost:3000/uploads/"+req.file.filename;
-    await req.user.save(); 
+    await req.user.save();  
 
     res.status(200).json({
       message: 'File uploaded successfully',

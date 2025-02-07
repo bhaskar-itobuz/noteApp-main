@@ -102,11 +102,11 @@ export const verifyData = async (req, res) => {
           "Email verification failed, possibly the link is invalid or expired"
         );
       } else {
-        res.send("Email verify successfully");
         const ans = await userSchema.findOne({ _id: decoded.userId });
         if (ans) {
           ans.verify = true;
           ans.save();
+          res.send("Email verify successfully ");
         } else {
           res.json({
             status: 404,
@@ -126,13 +126,14 @@ export const verifyData = async (req, res) => {
 export const checkLogin = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const ans = await userSchema.find({ email: email ,verify : true});
-    if (ans.length>=1) {
-      const userId = ans[0]._id;
-      const name = ans[0].userName;
-      bcrypt.compare(password, ans[0].password, async function (err, result) {
+    const ans = await userSchema.findOne({ email: email });
+    console.log(ans);
+    console.log(!ans.verify);
+    if (ans && ans.verify ) {
+      const userId = ans._id;
+      const name = ans.userName;
+      bcrypt.compare(password, ans.password, async function (err, result) {
         if (err) throw err;
-
         if (result === true) {
           const newUser = new sessionSchema({ userId });
           await newUser.save();
@@ -161,12 +162,21 @@ export const checkLogin = async (req, res) => {
             token,
             refreshToken,
           });
-        } else {
+        }
+         else {
           res.json({
             status: 404,
-            message: " wrong password",
+            message: " wrong credintial",
           });
         }
+      });
+    }
+    else if (ans && !ans.verify) {
+      console.log(ans);
+      await userSchema.findOneAndDelete({email :email});
+      res.json({
+        status: 404,
+        message: "You don't have verified Register again and verify",
       });
     } else {
       res.json({
