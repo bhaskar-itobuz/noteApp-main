@@ -227,8 +227,8 @@ export const sortbyQuery = async (req, res) => {
           const users = await noteSchema
             .find({ userId: id, title: { $regex: "^" + searchbyTitle } })
             .sort(sortCriteria)
-            .skip((pageNo - 1) * 3)
-            .limit(3);
+            .skip((pageNo - 1) * 6)
+            .limit(6);
           if (users.length > 0) {
             res.json({
               status: 200,
