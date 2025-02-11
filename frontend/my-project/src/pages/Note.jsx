@@ -4,12 +4,20 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useState } from "react";
 import { NoteCard } from "../components/NoteCard";
+import { IoIosAddCircle } from "react-icons/io";
+import { Modalpage } from "../components/Modal";
 
 export const NotePage = () => {
     const storedUserData = localStorage.getItem('user');
     const userData = JSON.parse(storedUserData)
     const userName = userData.name;
     const accesstoken = "Bearer " + userData.token;
+    const [formData, updateFormData] = useState('');
+
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => {
+        setOpen(false);
+    }
 
     const [selectedOption, setSelectedOption] = useState('');
     const handleChange = (event) => {
@@ -30,16 +38,13 @@ export const NotePage = () => {
             };
             try {
                 if (inputValue.length === 0) {
+                    
                     const res = await axios.get(`http://localhost:3000/note//sort?sortBy=${selectedOption}`, { headers })
-                    console.log(res.data.users);
                     setNote(res.data.users);
-                    console.log(notes);
                 }
-                else if(selectedOption === "title" || selectedOption === ""){
+                else if (selectedOption === "title" || selectedOption === "") {
                     const res = await axios.get(`http://localhost:3000/note//sort?sortBy=title&searchbyTitle=${inputValue}&sortOrder=desc`, { headers })
-                    console.log(res.data.users);
                     setNote(res.data.users);
-                    console.log(notes);
                 }
 
             } catch (error) {
@@ -47,11 +52,11 @@ export const NotePage = () => {
             }
         }
         getAllnote();
-    }, [selectedOption,inputValue])
+    }, [selectedOption, inputValue,open])
 
     const allNotes = notes.map((element) => {
         return (
-            <NoteCard note={element} />
+            <NoteCard key={element.title} note={element} />
         );
     });
 
@@ -104,10 +109,11 @@ export const NotePage = () => {
                     </div>
                 </div>
             </div>
-
-            <div className="flex flex-wrap">
+            <Modalpage setOpen={setOpen} open={open} handleOpen={handleOpen} accesstoken={accesstoken} formData={formData} updateFormData={updateFormData}/>
+            <div className="flex flex-wrap justify-center gap-2">
                 {allNotes}
             </div>
+            <button className="absolute top-[70vh]  lg:top-[85vh] right-[30px] ">< IoIosAddCircle style={{ fontSize: '4em', cursor: "pointer" }} onClick={() => setOpen(true)} /></button>
         </>
     );
 }
