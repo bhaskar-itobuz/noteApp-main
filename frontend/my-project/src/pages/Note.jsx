@@ -1,4 +1,4 @@
-import notesimg from "../assets/notes.png";
+import notesImg from "../assets/notes.png";
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -6,17 +6,59 @@ import { useState } from "react";
 import { NoteCard } from "../components/NoteCard";
 import { IoIosAddCircle } from "react-icons/io";
 import { Modalpage } from "../components/Modal";
+import { Alert } from "../components/AlertModal";
+import {toast } from 'react-toastify';
+
 
 export const NotePage = () => {
+
     const storedUserData = localStorage.getItem('user');
     const userData = JSON.parse(storedUserData)
     const userName = userData.name;
     const accesstoken = "Bearer " + userData.token;
     const [formData, updateFormData] = useState('');
+    const [noteId, setNoteId] = useState('');
+    // const [update,setupdate] = useState('');
+
+    const [openModal, setOpenModal] = useState(false);
+    const handleAleart = () => {
+        setOpenModal(!openModal);
+    }
+
+    
+    const handleSubmit = async(e) => {
+        e.preventDefault()
+        const headers = {
+            'Authorization': accesstoken,
+        };
+        const payload = {
+            title: formData.name,
+            content: formData.content,
+        };
+        try {
+            console.log("post",accesstoken);
+            const res = await axios.post(`http://localhost:3000/note/create`,payload,{ headers })
+            if(res.data.message==="sucess"){
+                toast.success(res.data.message);
+            }
+            else{
+                toast.error(res.data.message);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+        setOpen(false);
+    };
+
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => {
         setOpen(false);
+    }
+
+    const [updateNote, setUpdate] = useState(false);
+    const handleUpdate = () => {
+        setUpdate(!updateNote);
     }
 
     const [selectedOption, setSelectedOption] = useState('');
@@ -38,12 +80,12 @@ export const NotePage = () => {
             };
             try {
                 if (inputValue.length === 0) {
-                    
-                    const res = await axios.get(`http://localhost:3000/note//sort?sortBy=${selectedOption}`, { headers })
+
+                    const res = await axios.get(`http://localhost:3000/note/sort?sortBy=${selectedOption}`, { headers })
                     setNote(res.data.users);
                 }
                 else if (selectedOption === "title" || selectedOption === "") {
-                    const res = await axios.get(`http://localhost:3000/note//sort?sortBy=title&searchbyTitle=${inputValue}&sortOrder=desc`, { headers })
+                    const res = await axios.get(`http://localhost:3000/note/sort?sortBy=title&searchbyTitle=${inputValue}&sortOrder=desc`, { headers })
                     setNote(res.data.users);
                 }
 
@@ -52,11 +94,11 @@ export const NotePage = () => {
             }
         }
         getAllnote();
-    }, [selectedOption, inputValue,open])
+    }, [selectedOption, inputValue, open, openModal ,updateNote])
 
     const allNotes = notes.map((element) => {
         return (
-            <NoteCard key={element.title} note={element} />
+            <NoteCard key={element.title} note={element} openModal={openModal} setOpenModal={setOpenModal} noteId={noteId} setNoteId={setNoteId} handleUpdate={handleUpdate} />
         );
     });
 
@@ -66,7 +108,7 @@ export const NotePage = () => {
             <nav className="bg-blue-500 p-4 shadow-md">
                 <div className="container mx-auto flex justify-between items-center">
                     <div className="flex justify-center items-center">
-                        <img className="w-10" src={notesimg} alt="notes image" />
+                        <img className="w-10" src={notesImg} alt="notes image" />
                         <Link to="/" className="text-white text-2xl font-bold">
                             Note App
                         </Link>
@@ -109,7 +151,9 @@ export const NotePage = () => {
                     </div>
                 </div>
             </div>
-            <Modalpage setOpen={setOpen} open={open} handleOpen={handleOpen} accesstoken={accesstoken} formData={formData} updateFormData={updateFormData}/>
+            { openModal && <Alert openModal={openModal} setOpenModal={setOpenModal} handleOpen={handleAleart} noteId={noteId}/>}
+            
+            <Modalpage setOpen={setOpen} open={open} handleOpen={handleOpen} accesstoken={accesstoken} formData={formData} updateFormData={updateFormData} handleSubmit={handleSubmit} />
             <div className="flex flex-wrap justify-center gap-2">
                 {allNotes}
             </div>

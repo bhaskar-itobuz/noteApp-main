@@ -1,6 +1,4 @@
 import React, { useEffect } from "react";
-import { ToastContainer, toast } from 'react-toastify';
-import axios from "axios";
 import {
     Button,
     Dialog,
@@ -9,38 +7,12 @@ import {
     DialogFooter,
 } from "@material-tailwind/react";
 
-export function Modalpage({ setOpen, open, handleOpen ,accesstoken,formData,updateFormData}) {
+export function Modalpage({ setOpen, open, handleOpen ,formData,updateFormData,handleSubmit}) {
     const handleChange = (e) => {
         updateFormData({
             ...formData,
             [e.target.name]: e.target.value.trim()
         });
-    };
-
-    const handleSubmit = async(e) => {
-
-        e.preventDefault()
-        const headers = {
-            'Authorization': accesstoken,
-        };
-        const payload = {
-            title: formData.name,
-            content: formData.content,
-        };
-        try {
-            console.log("post",accesstoken);
-            const res = await axios.post(`http://localhost:3000/note/create`,payload,{ headers })
-            console.log(res);
-            if(res.data.message==="sucess"){
-                toast.success(res.data.message);
-            }
-            else{
-                toast.error(res.data.message);
-            }
-        } catch (error) {
-            console.error(error);
-        }
-        setOpen(false);
     };
 
     return (

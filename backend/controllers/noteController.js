@@ -71,7 +71,9 @@ export const updateData = async (req, res) => {
         const ans = await userSchema.findOne({ _id: id });
         const loginCheck = await sessionSchema.findOne({ userId: id });
         console.log(findId);
-        if (findId && ans && loginCheck) {
+        const findTitle = await noteSchema.findOne({title:title})
+
+        if (findId && ans && loginCheck && !findTitle) {
           console.log("hi");
           await noteSchema.findByIdAndUpdate(noteId, {
             title,
