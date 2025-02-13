@@ -14,7 +14,7 @@ export function Alert({ openModal, setOpenModal, handleOpen, noteId }) {
             'Authorization': accesstoken,
         };
         try {
-            const res = await axios.delete(`http://localhost:3000/note//delete/${noteId}`, { headers })
+            const res = await axios.delete(`http://localhost:3000/note/delete/${noteId}`, { headers })
             if (res.data.message === "Delete sucessfully") {
                 toast.success(res.data.message);
             }

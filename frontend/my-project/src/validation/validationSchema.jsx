@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const registrationSchema = z
   .object({
-    name: z.string().min(3, "Name must be at least 3 characters"),
+    name: z.string().trim().min(3, "Name must be at least 3 characters"),
     email: z.string().email("Invalid email format"),
     password: z
       .string()
@@ -12,7 +12,7 @@ export const registrationSchema = z
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    messageessage: "Passwords do not match",
+    message: "Passwords do not match",
     path: ["confirmPassword"],
   });
 
@@ -25,4 +25,8 @@ export const loginSchema = z.object({
     .min(6, "Password must be at least 6 characters")
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
     .regex(/[!@#$%^&*(),.?\”:{}|<>]/, "Password must contain at least one special character"),
+});
+
+export const noteSchema = z.object({
+  title: z.string().trim().min(3 ,"title must have 3 character"),
 });

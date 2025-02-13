@@ -22,11 +22,11 @@ export const createData = async (req, res) => {
       } else {
         const id = decoded.userId;
         const { title, content } = req.body;
-        const ans = await userSchema.findOne({ _id: id });
+        const findId = await userSchema.findOne({ _id: id });
         const sameTitle = await noteSchema.find({ title: title, userId: id });
         const loginCheck = await sessionSchema.findOne({ userId: id });
         const userId = loginCheck.userId;
-        if (ans && sameTitle.length === 0 && loginCheck) {
+        if (findId && sameTitle.length === 0 && loginCheck) {
           const add = await noteSchema.create({
             userId,
             title,
@@ -68,12 +68,18 @@ export const updateData = async (req, res) => {
         console.log(noteId);
         const { title, content } = req.body;
         const findId = await noteSchema.findOne({ _id: noteId });
-        const ans = await userSchema.findOne({ _id: id });
+        const findUserId = await userSchema.findOne({ _id: id });
         const loginCheck = await sessionSchema.findOne({ userId: id });
-        console.log(findId);
-        const findTitle = await noteSchema.findOne({title:title})
+        const findTitle = await noteSchema.findOne({ title: title });
+        if(findTitle && findTitle._id != noteId){
+          return res.json({
+            status: 404,
+            message: "Updating failed",
+          });
+        }
+        
 
-        if (findId && ans && loginCheck && !findTitle) {
+        if (findId && findUserId && loginCheck ) {
           console.log("hi");
           await noteSchema.findByIdAndUpdate(noteId, {
             title,
@@ -81,12 +87,12 @@ export const updateData = async (req, res) => {
           });
           res.json({
             status: 200,
-            message: "sucess",
+            message: "Updated Successfully",
           });
         } else {
           res.json({
             status: 404,
-            message: "not success",
+            message: "Update failed",
           });
         }
       }
@@ -111,15 +117,15 @@ export const deleteData = async (req, res) => {
         const id = decoded.userId;
         const { noteId } = req.params;
         const findId = await noteSchema.findOne({ _id: noteId });
-        const ans = await userSchema.findOne({ _id: id });
+        const findUserId = await userSchema.findOne({ _id: id });
         const loginCheck = await sessionSchema.findOne({ userId: id });
-        if (findId && ans && loginCheck) {
+        if (findId && findUserId && loginCheck) {
           console.log("hi");
           await noteSchema.findByIdAndDelete(noteId);
           res.json({
             status: 200,
             message: "Delete sucessfully",
-          });          
+          });
         } else {
           res.json({
             status: 404,
@@ -146,12 +152,12 @@ export const findAll = async (req, res) => {
         res.send("possibly the link is invalid or expired");
       } else {
         const id = decoded.userId;
-        const ans = await userSchema.findOne({ _id: id });
+        const findId = await userSchema.findOne({ _id: id });
         const loginCheck = await sessionSchema.findOne({ userId: id });
         const userId = loginCheck.userId;
         console.log(userId);
         const users = await noteSchema.find({ userId: userId });
-        if (ans && loginCheck && users) {
+        if (findId && loginCheck && users) {
           res.json({
             status: 200,
             message: "find successfully",
@@ -184,10 +190,10 @@ export const findbyId = async (req, res) => {
       } else {
         const id = decoded.userId;
         const { noteId } = req.params;
-        const ans = await userSchema.findOne({ _id: id });
+        const findId = await userSchema.findOne({ _id: id });
         const loginCheck = await sessionSchema.findOne({ userId: id });
         const users = await noteSchema.findOne({ _id: noteId });
-        if (ans && loginCheck && users) {
+        if (findId && loginCheck && users) {
           res.json({
             status: 200,
             message: "find successfully",
@@ -218,9 +224,9 @@ export const sortbyQuery = async (req, res) => {
         res.send("possibly the link is invalid or expired");
       } else {
         const id = decoded.userId;
-        const ans = await userSchema.findOne({ _id: id });
+        const findId = await userSchema.findOne({ _id: id });
         const loginCheck = await sessionSchema.findOne({ userId: id });
-        if (ans && loginCheck) {
+        if (findId && loginCheck) {
           const sortBy = req.query.sortBy || "timestamps";
           const sortOrder = req.query.sortOrder === "desc" ? -1 : 1;
           const pageNo = req.query.pageNo || 1;

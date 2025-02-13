@@ -5,10 +5,16 @@ import { MdEditDocument } from "react-icons/md";
 import { Modalpage } from "./Modal";
 import { useState } from "react";
 import axios from "axios";
-import {toast } from 'react-toastify';
+import { toast } from 'react-toastify';
+import { Viewnote } from "./ViewModal";
 
 
-export const NoteCard = ({ note, setOpenModal, openModal, setNoteId , handleUpdate}) => {
+export const NoteCard = ({ note, setOpenModal, openModal, setNoteId, handleUpdate }) => {
+
+    const [Openview, setOpenview] = useState(false);
+    const handleView =()=>{
+        setOpenview(false);
+    }
 
     const storedUserData = localStorage.getItem('user');
     const userData = JSON.parse(storedUserData)
@@ -25,7 +31,9 @@ export const NoteCard = ({ note, setOpenModal, openModal, setNoteId , handleUpda
         setOpen(false);
     }
 
-    const [formData, updateFormData] = useState('');
+    const [formData, updateFormData] = useState({
+        name: note.title, content: note.content
+    });
     const handleSubmit = async (e) => {
         e.preventDefault()
         const headers = {
@@ -36,13 +44,19 @@ export const NoteCard = ({ note, setOpenModal, openModal, setNoteId , handleUpda
             content: formData.content,
         };
         try {
-            console.log("post", accesstoken);
-            const res = await axios.put(`http://localhost:3000/note//update/${note._id}`, payload, { headers })
-            if (res.data.message === "sucess") {
-                toast.success("update successfully");
+            if (formData.name.trim().length >=3) {
+                const res = await axios.put(`http://localhost:3000/note/update/${note._id}`, payload, { headers })
+                console.log(res);
+                if (res.data.message === "Updated Successfully") {
+                    toast.success("update successfully");
+                }
+                else {
+                    toast.error(res.data.message);
+                }
             }
-            else {
-                toast.error(res.data.message);
+            else{
+                formData.name=note.title;
+                toast.error("title must have 3 character");
             }
         } catch (error) {
             console.error(error);
@@ -57,12 +71,12 @@ export const NoteCard = ({ note, setOpenModal, openModal, setNoteId , handleUpda
             <p className="text-gray-700 ">{note.content}</p>
             <div className="absolute flex bottom-[20px]  right-[20px] gap-[20px]">
 
-                <Modalpage setOpen={setOpen} open={open} handleOpen={handleOpen} accesstoken={accesstoken} formData={formData} updateFormData={updateFormData} handleSubmit={handleSubmit} title={note.title}/>
-
+                <Modalpage setOpen={setOpen} open={open} handleOpen={handleOpen} accesstoken={accesstoken} formData={formData} updateFormData={updateFormData} handleSubmit={handleSubmit} title={note.title} content={note.content} />
+                <Viewnote Openview={Openview} setOpenview={setOpenview} handleView={handleView} title={note.title} content={note.content}/>
 
                 <button><MdDelete style={{ fontSize: '2em', cursor: "pointer" }} onClick={handleAleart} /></button>
                 <button><MdEditDocument style={{ fontSize: '2em', cursor: "pointer" }} onClick={() => setOpen(true)} /></button>
-                <button ><FaEnvelopeOpenText style={{ fontSize: '2em', cursor: "pointer" }} /></button>
+                <button ><FaEnvelopeOpenText style={{ fontSize: '2em', cursor: "pointer" }} onClick={() => setOpenview(true)} /></button>
             </div>
 
         </div>

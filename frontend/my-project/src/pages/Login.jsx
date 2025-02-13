@@ -46,7 +46,7 @@ export const LogIn = () => {
                     <form action="#" onSubmit={handleSubmit(onSubmit)}>
                         <div>
                             <label className="block font-medium">Email:</label>
-                            <input type="email" {...register("email")} className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-400" />
+                            <input type="email" defaultValue="sambit@gmail.com" {...register("email")} className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-400" />
                             <p className={`text-red-500 text-sm mt-1 min-h-[20px] ${errors.email ? "visible" : "invisible"}`}>
                                 {errors.email?.message}
                             </p>
@@ -54,7 +54,7 @@ export const LogIn = () => {
 
                         <div>
                             <label className="block font-medium">Password:</label>
-                            <input type="password" {...register("password")} className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-400" />
+                            <input type="password" defaultValue="bhas@1234" {...register("password")} className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-400" />
                             <p className={`text-red-500 text-sm mt-1 min-h-[20px] ${errors.password ? "visible" : "invisible"}`}>
                                 {errors.password?.message}
                             </p>
