@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { Viewnote } from "./ViewModal";
 
 
+
 export const NoteCard = ({ note, setOpenModal, openModal, setNoteId, handleUpdate }) => {
 
     const [Openview, setOpenview] = useState(false);
@@ -67,8 +68,8 @@ export const NoteCard = ({ note, setOpenModal, openModal, setNoteId, handleUpdat
 
     return (
         <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 w-[45%] md:w-[30%] lg:w-[32%] min-h-64 relative">
-            <h3 className="text-xl font-bold">{note.title}</h3>
-            <p className="text-gray-700 ">{note.content}</p>
+            <h3 className="text-xl font-bold max-w-[90%] overflow-scroll no-scrollbar">{note.title}</h3>
+            <p className="text-gray-700 max-w-[90%] max-h-[70%] overflow-y-scroll break-words no-scrollbar">{note.content}</p>
             <div className="absolute flex bottom-[20px]  right-[20px] gap-[20px]">
 
                 <Modalpage setOpen={setOpen} open={open} handleOpen={handleOpen} accesstoken={accesstoken} formData={formData} updateFormData={updateFormData} handleSubmit={handleSubmit} title={note.title} content={note.content} />
@@ -82,3 +83,4 @@ export const NoteCard = ({ note, setOpenModal, openModal, setNoteId, handleUpdat
         </div>
     );
 };
+

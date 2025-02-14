@@ -27,6 +27,3 @@ export const loginSchema = z.object({
     .regex(/[!@#$%^&*(),.?\”:{}|<>]/, "Password must contain at least one special character"),
 });
 
-export const noteSchema = z.object({
-  title: z.string().trim().min(3 ,"title must have 3 character"),
-});

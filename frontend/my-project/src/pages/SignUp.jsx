@@ -26,13 +26,12 @@ export const RegistrationForm = () => {
         try {
             const response = await axios.post('http://localhost:3000/user/create', payload);
             if (response.data.message === "sucess") {
-                toast.success("Registration successful!");
-                console.log(response.data);
+                toast.success("Registration successful Check the email for verification!");
                 navigate('/login');
             }
             else {
                 toast.error(response.data.message);
-                console.log(response.data);
+
             }
         } catch (error) {
             toast.error(error.response?.data?.message || "Registration failed!");

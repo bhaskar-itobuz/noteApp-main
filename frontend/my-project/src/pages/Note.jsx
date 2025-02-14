@@ -16,6 +16,14 @@ export const NotePage = () => {
     const accesstoken = "Bearer " + userData.token;
     const [formData, updateFormData] = useState("");
     const [noteId, setNoteId] = useState("");
+    
+    const [count, setCount] = useState(1);
+    const incrementCount = async() => {
+        setCount(count + 1);
+    };
+    const decrementCount = () => {
+        setCount(count - 1);
+    };
 
     const [openModal, setOpenModal] = useState(false);
     const handleAleart = () => {
@@ -33,10 +41,10 @@ export const NotePage = () => {
         };
         try {
             console.log(formData.name);
-            if(formData.name ===undefined){
+            if (formData.name === undefined) {
                 toast.error("title must have 3 character");
             }
-            else{
+            else {
                 if (formData.name.trim().length >= 3) {
                     const res = await axios.post(
                         `http://localhost:3000/note/create`,
@@ -78,7 +86,6 @@ export const NotePage = () => {
     const [inputValue, setInputValue] = useState("");
     const handleInputChange = (event) => {
         setInputValue(event.target.value);
-        console.log(inputValue);
     };
 
     const [notes, setNote] = useState([]);
@@ -89,24 +96,46 @@ export const NotePage = () => {
             };
             try {
                 if (inputValue.length === 0) {
-                    const res = await axios.get(
-                        `http://localhost:3000/note/sort?sortBy=${selectedOption}`,
-                        { headers }
-                    );
-                    setNote(res.data.users);
+                    if(count>0){
+                        const res = await axios.get(
+                            `http://localhost:3000/note/sort?sortBy=${selectedOption}&pageNo=${count}`,
+                            { headers }
+                        );
+                        if(res.data.pageCount<count && count>=1){
+                            setCount(count-1);
+                            const res = await axios.get(
+                                `http://localhost:3000/note/sort?sortBy=${selectedOption}&pageNo=${count-1}`,
+                                { headers }
+                            );
+                            if(res.data.pageCount===0){
+                                setNote([]);
+                            }
+                            else{
+                                setNote(res.data.users);
+                            }
+                        }
+                        else{
+                            setNote(res.data.users);
+                        }
+                    }
+                    else{
+                        setCount(count+1);
+                    }
+
                 } else if (selectedOption === "title" || selectedOption === "") {
                     const res = await axios.get(
                         `http://localhost:3000/note/sort?sortBy=title&searchbyTitle=${inputValue}&sortOrder=desc`,
                         { headers }
                     );
-                    setNote(res.data.users);
+                    res.data.status === 200 ?
+                    setNote(res.data.users) : setNote([]);
                 }
             } catch (error) {
                 console.error(error);
             }
         };
         getAllnote();
-    }, [selectedOption, inputValue, open, openModal, updateNote]);
+    }, [selectedOption, inputValue, open, openModal, updateNote,count]);
 
     const allNotes = notes.map((element) => {
         return (
@@ -121,6 +150,26 @@ export const NotePage = () => {
             />
         );
     });
+
+
+    const [isverify, setVerify] = useState(false);
+    const handleLogout = async () => {
+        const headers = {
+            Authorization: accesstoken,
+        };
+        try {
+            const res = await axios.get(
+                `http://localhost:3000/user/logout`,
+                { headers }
+            );
+            localStorage.removeItem("user");
+            toast.success("Logout Successfully");
+        } catch (error) {
+            console.error(error);
+            toast.error("Logout failed");
+        }
+        setVerify(false);
+    };
 
     return (
         <>
@@ -137,6 +186,7 @@ export const NotePage = () => {
                         <Link
                             to="/login"
                             className="bg-white text-blue-500 px-4 py-2 rounded hover:bg-gray-200 transition"
+                            onClick={handleLogout}
                         >
                             LogOut
                         </Link>
@@ -185,6 +235,13 @@ export const NotePage = () => {
                     </div>
                 </div>
             </div>
+
+            <div className="page flex justify-center items-center gap-3 mb-4">
+                <button className="w-[20vw] md:w-[10vw] lg:w-[6vw] bg-black text-white p-3" onClick={decrementCount}>Pre</button>
+                <p>{count}</p>
+                <button className="w-[20vw] md:w-[10vw] lg:w-[6vw] bg-black text-white p-3" onClick={incrementCount}>Next</button>
+            </div>
+
             {openModal && (
                 <Alert
                     openModal={openModal}
@@ -211,6 +268,7 @@ export const NotePage = () => {
                     onClick={() => setOpen(true)}
                 />
             </button>
+
         </>
     );
 };

@@ -71,15 +71,14 @@ export const updateData = async (req, res) => {
         const findUserId = await userSchema.findOne({ _id: id });
         const loginCheck = await sessionSchema.findOne({ userId: id });
         const findTitle = await noteSchema.findOne({ title: title });
-        if(findTitle && findTitle._id != noteId){
+        if (findTitle && findTitle._id != noteId) {
           return res.json({
             status: 404,
             message: "Updating failed",
           });
         }
-        
 
-        if (findId && findUserId && loginCheck ) {
+        if (findId && findUserId && loginCheck) {
           console.log("hi");
           await noteSchema.findByIdAndUpdate(noteId, {
             title,
@@ -229,7 +228,8 @@ export const sortbyQuery = async (req, res) => {
         if (findId && loginCheck) {
           const sortBy = req.query.sortBy || "timestamps";
           const sortOrder = req.query.sortOrder === "desc" ? -1 : 1;
-          const pageNo = req.query.pageNo || 1;
+
+          const pageNo = req.query.pageNo > 0 ? req.query.pageNo : 1;
           const searchbyTitle = req.query.searchbyTitle || "";
           const sortCriteria = { [sortBy]: sortOrder };
           const users = await noteSchema
@@ -237,17 +237,24 @@ export const sortbyQuery = async (req, res) => {
             .sort(sortCriteria)
             .skip((pageNo - 1) * 6)
             .limit(6);
+          const noteCount = await noteSchema
+            .find({ userId: id, title: { $regex: "^" + searchbyTitle } })
+            .countDocuments();
           if (users.length > 0) {
             res.json({
               status: 200,
               message: "find successfully",
               users,
+              noteCount,
+              pageCount: Math.ceil(noteCount / 6),
             });
           } else {
             res.json({
               status: 404,
               message: "not find matching data",
-              users,
+              noteCount,
+              pageCount: Math.ceil(noteCount / 6),
+
             });
           }
         } else {
