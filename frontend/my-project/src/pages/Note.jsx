@@ -1,24 +1,72 @@
+
 import notesImg from "../assets/notes.png";
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import { useState } from "react";
+// import axiosInstance from "axiosInstance";
+// import axios from "axios";
+import { useState, useRef } from "react";
 import { NoteCard } from "../components/NoteCard";
 import { IoIosAddCircle } from "react-icons/io";
 import { Modalpage } from "../components/Modal";
 import { Alert } from "../components/AlertModal";
 import { toast } from "react-toastify";
+// import axiosInstanceInstance from "../axiosInstanceInstance/axiosInstanceInstance";
+import axiosInstance from "../AxiosInstance/AxiosInstance";
+import axios from "axios";
+
 
 export const NotePage = () => {
     const storedUserData = localStorage.getItem("user");
     const userData = JSON.parse(storedUserData);
     const userName = userData.name;
+    const userId = userData.userId;
+    const profilePicture = userData.profilePicture;
     const accesstoken = "Bearer " + userData.token;
     const [formData, updateFormData] = useState("");
     const [noteId, setNoteId] = useState("");
-    
+
+    const inputRef = useRef(null);
+    const [image, setImage] = useState("");
+    const handleImageClick = () => {
+        inputRef.current.click();
+    }
+    const handleImageChange = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("file", file); // Append file to formData
+
+        try {
+            const headers = {
+                Authorization: accesstoken, 
+                // Include Authorization token
+            };
+
+            // Making the API call
+            const response = await axiosInstance.post(
+                `http://localhost:3000/user/upload?userId=${userId}`, // API URL with query param
+                formData,
+                { headers }
+            );
+
+            // Check API response
+            console.log(response.data.message);
+            if (response.data.message === "File uploaded successfully") {
+                toast.success("File uploaded successfully!");
+                // setImage(URL.createObjectURL(file)); // Update UI with the new image
+                setImage(response.data.imageUrl || file);
+            } else {
+                toast.error("File upload failed!");
+            }
+        } catch (error) {
+            console.error("Upload error:", error);
+            toast.error("Error uploading file.");
+        }
+    }
+
     const [count, setCount] = useState(1);
-    const incrementCount = async() => {
+    const incrementCount = async () => {
         setCount(count + 1);
     };
     const decrementCount = () => {
@@ -46,7 +94,7 @@ export const NotePage = () => {
             }
             else {
                 if (formData.name.trim().length >= 3) {
-                    const res = await axios.post(
+                    const res = await axiosInstance.post(
                         `http://localhost:3000/note/create`,
                         payload,
                         { headers }
@@ -96,46 +144,50 @@ export const NotePage = () => {
             };
             try {
                 if (inputValue.length === 0) {
-                    if(count>0){
-                        const res = await axios.get(
+                    if (count > 0) {
+                        const res = await axiosInstance.get(
                             `http://localhost:3000/note/sort?sortBy=${selectedOption}&pageNo=${count}`,
                             { headers }
                         );
-                        if(res.data.pageCount<count && count>=1){
-                            setCount(count-1);
-                            const res = await axios.get(
-                                `http://localhost:3000/note/sort?sortBy=${selectedOption}&pageNo=${count-1}`,
+                        if (res.data.pageCount < count && count >= 1) {
+                            setCount(count - 1);
+                            const res = await axiosInstance.get(
+                                `http://localhost:3000/note/sort?sortBy=${selectedOption}&pageNo=${count - 1}`,
                                 { headers }
                             );
-                            if(res.data.pageCount===0){
+                            if (res.data.pageCount === 0) {
                                 setNote([]);
                             }
-                            else{
+                            else {
                                 setNote(res.data.users);
                             }
                         }
-                        else{
+                        else {
                             setNote(res.data.users);
                         }
                     }
-                    else{
-                        setCount(count+1);
+                    else {
+                        setCount(count + 1);
                     }
 
                 } else if (selectedOption === "title" || selectedOption === "") {
-                    const res = await axios.get(
+                    const res = await axiosInstance.get(
                         `http://localhost:3000/note/sort?sortBy=title&searchbyTitle=${inputValue}&sortOrder=desc`,
                         { headers }
                     );
                     res.data.status === 200 ?
-                    setNote(res.data.users) : setNote([]);
+                        setNote(res.data.users) : setNote([]);
                 }
             } catch (error) {
                 console.error(error);
             }
         };
-        getAllnote();
-    }, [selectedOption, inputValue, open, openModal, updateNote,count]);
+        const delayDebounce = setTimeout(() => {
+            getAllnote();
+        }, 500); // Wait 500ms after the user stops typing before calling API
+
+        return () => clearTimeout(delayDebounce);
+    }, [selectedOption, inputValue, open, openModal, updateNote, count, image]);
 
     const allNotes = notes.map((element) => {
         return (
@@ -158,7 +210,7 @@ export const NotePage = () => {
             Authorization: accesstoken,
         };
         try {
-            const res = await axios.get(
+            const res = await axiosInstance.get(
                 `http://localhost:3000/user/logout`,
                 { headers }
             );
@@ -183,6 +235,20 @@ export const NotePage = () => {
                     </div>
                     <div className="flex justify-center items-center gap-2">
                         <p className="text-white text-xl font-bold">hi {userName}</p>
+                        <div onClick={handleImageClick} className="">
+                            {/* {image ? (<img src={URL.createObjectURL(image)} alt="fghj" className="w-[30px] h-[30px] rounded-[50%]"/>) : (<img src="" alt="fghj" />)} */}
+                            {image ? (
+                                <img
+                                    src={typeof image === "string" ? image : URL.createObjectURL(image)}
+                                    alt="Uploaded"
+                                    className="w-[30px] h-[30px] rounded-full"
+                                />
+                            ) : (
+                                <img src={profilePicture} alt="Placeholder" className="w-[30px] h-[30px] rounded-full" />
+                            )}
+                            <input type="file" ref={inputRef} onChange={handleImageChange} style={{ display: "none" }} />
+                        </div>
+
                         <Link
                             to="/login"
                             className="bg-white text-blue-500 px-4 py-2 rounded hover:bg-gray-200 transition"
@@ -192,6 +258,8 @@ export const NotePage = () => {
                         </Link>
                     </div>
                 </div>
+
+
             </nav>
 
             <div className="my-5">
@@ -271,4 +339,4 @@ export const NotePage = () => {
 
         </>
     );
-};
+}; 
