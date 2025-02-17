@@ -18,7 +18,7 @@ export const createData = async (req, res) => {
     jwt.verify(token, "ourSecretKey", async function (err, decoded) {
       if (err) {
         console.log(err);
-        res.send("possibly the link is invalid or expired");
+        res.status(498).send("possibly the link is invalid or expired");
       } else {
         const id = decoded.userId;
         const { title, content } = req.body;
@@ -61,7 +61,7 @@ export const updateData = async (req, res) => {
     jwt.verify(token, "ourSecretKey", async function (err, decoded) {
       if (err) {
         console.log(err);
-        res.send("possibly the link is invalid or expired");
+        res.status(498).send("possibly the link is invalid or expired");
       } else {
         const id = decoded.userId;
         const { noteId } = req.params;
@@ -111,7 +111,7 @@ export const deleteData = async (req, res) => {
     jwt.verify(token, "ourSecretKey", async function (err, decoded) {
       if (err) {
         console.log(err);
-        res.send("possibly the link is invalid or expired");
+        res.status(498).send("possibly the link is invalid or expired");
       } else {
         const id = decoded.userId;
         const { noteId } = req.params;
@@ -148,7 +148,7 @@ export const findAll = async (req, res) => {
     jwt.verify(token, "ourSecretKey", async function (err, decoded) {
       if (err) {
         console.log(err);
-        res.send("possibly the link is invalid or expired");
+        res.status(498).send("possibly the link is invalid or expired");
       } else {
         const id = decoded.userId;
         const findId = await userSchema.findOne({ _id: id });
@@ -185,7 +185,7 @@ export const findbyId = async (req, res) => {
     jwt.verify(token, "ourSecretKey", async function (err, decoded) {
       if (err) {
         console.log(err);
-        res.send("possibly the link is invalid or expired");
+        res.status(498).send("possibly the link is invalid or expired");
       } else {
         const id = decoded.userId;
         const { noteId } = req.params;
@@ -220,7 +220,7 @@ export const sortbyQuery = async (req, res) => {
     jwt.verify(token, "ourSecretKey", async function (err, decoded) {
       if (err) {
         console.log(err);
-        res.send("possibly the link is invalid or expired");
+        res.status(498).send("possibly the link is invalid or expired");
       } else {
         const id = decoded.userId;
         const findId = await userSchema.findOne({ _id: id });

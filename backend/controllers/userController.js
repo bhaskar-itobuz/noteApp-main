@@ -1,11 +1,10 @@
-
 import userSchema from "../model/userSchema.js";
 import sessionSchema from "../model/sessionSchema.js";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
-import hbs from 'nodemailer-express-handlebars';
+import hbs from "nodemailer-express-handlebars";
 
 dotenv.config();
 
@@ -22,7 +21,7 @@ function getBearerToken(req) {
 export const createData = async (req, res) => {
   try {
     const { email, userName, password } = req.body;
-    const ans = await userSchema.findOne({ email: email  });
+    const ans = await userSchema.findOne({ email: email });
     if (ans) {
       res.json({
         status: 404,
@@ -41,7 +40,7 @@ export const createData = async (req, res) => {
           data: "Token Data",
         },
         "ourSecretKey",
-        { expiresIn: "10m" }
+        { expiresIn: "15m" }
       );
 
       if (addUser) {
@@ -53,25 +52,28 @@ export const createData = async (req, res) => {
           },
         });
 
-        transporter.use('compile', hbs({
+        transporter.use(
+          "compile",
+          hbs({
             viewEngine: {
-                extname: '.hbs',
-                layoutsDir: 'views/',
-                defaultLayout: false,
-                partialsDir: 'views/',
+              extname: ".hbs",
+              layoutsDir: "views/",
+              defaultLayout: false,
+              partialsDir: "views/",
             },
-            viewPath: 'views/',
-            extName: '.hbs'
-        }));
+            viewPath: "views/",
+            extName: ".hbs",
+          })
+        );
 
         const mailConfigurations = {
           from: "bhaskar@itobuz.com",
           to: "bhaskar@itobuz.com",
           subject: "Email Verification",
-          template: 'email_template',
-            context: {
-                token: token,
-            }
+          template: "email_template",
+          context: {
+            token: token,
+          },
         };
         transporter.sendMail(mailConfigurations, function (error) {
           if (error) throw Error(error);
@@ -129,9 +131,10 @@ export const checkLogin = async (req, res) => {
     const ans = await userSchema.findOne({ email: email });
     console.log(ans);
     console.log(!ans.verify);
-    if (ans && ans.verify ) {
+    if (ans && ans.verify) {
       const userId = ans._id;
       const name = ans.userName;
+      const profilePicture = ans.fileName;
       bcrypt.compare(password, ans.password, async function (err, result) {
         if (err) throw err;
         if (result === true) {
@@ -144,7 +147,7 @@ export const checkLogin = async (req, res) => {
               data: "Token Data",
             },
             "ourSecretKey",
-            { expiresIn: "10m" }
+            { expiresIn: "5s" }
           );
 
           const refreshToken = jwt.sign(
@@ -153,27 +156,27 @@ export const checkLogin = async (req, res) => {
               data: "Token Data",
             },
             "ourSecretKey",
-            { expiresIn: "30m" }
+            { expiresIn: "1h" }
           );
           res.json({
             status: 200,
             message: " valid user",
+            profilePicture,
+            userId,
             name,
             token,
             refreshToken,
           });
-        }
-         else {
+        } else {
           res.json({
             status: 404,
             message: " wrong credintial",
           });
         }
       });
-    }
-    else if (ans && !ans.verify) {
+    } else if (ans && !ans.verify) {
       console.log(ans);
-      await userSchema.findOneAndDelete({email :email});
+      await userSchema.findOneAndDelete({ email: email });
       res.json({
         status: 404,
         message: "You don't have verified Register again and verify",
@@ -195,10 +198,11 @@ export const checkLogin = async (req, res) => {
 export const generateAccestoken = async (req, res) => {
   try {
     const token = getBearerToken(req);
+    console.log("token creates");
     jwt.verify(token, "ourSecretKey", async function (err, decoded) {
       if (err) {
         console.log(err);
-        res.send("possibly the link is invalid or expired");
+        res.status(498).send("possibly the link is invalid or expired");
       } else {
         const userId = decoded.userId;
         const newAccesstoken = jwt.sign(
@@ -207,8 +211,9 @@ export const generateAccestoken = async (req, res) => {
             data: "Token Data",
           },
           "ourSecretKey",
-          { expiresIn: "10m" }
+          { expiresIn: "1m" }
         );
+
         res.json({
           status: 200,
           message: "new token generated",
@@ -240,12 +245,11 @@ export const logout = async (req, res) => {
             status: 200,
             message: "session deleted successfully",
           });
-        }
-        else{
-            res.json({
-                status: 404,
-                message: "session not found",
-              });
+        } else {
+          res.json({
+            status: 404,
+            message: "session not found",
+          });
         }
       }
     });
