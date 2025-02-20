@@ -31,6 +31,7 @@
     "nodemailer-express-handlebars": "^7.0.0",
     "nodemon": "^3.1.9",
     "path": "^0.12.7",
+    "socket.io": "^4.8.1",
     "zod": "^3.24.1"
   },
   "devDependencies": {

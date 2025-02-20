@@ -12,3 +12,22 @@ export const dbConnection = async function dbConnect() {
     console.error(e);
   }
 };
+
+
+// import { Server } from "socket.io";
+// import http from "http";
+
+// const app = express();
+// const port = process.env.port; 
+
+// const server = http.createServer(app); // Add this
+// const io = new Server(server, {
+//   cors: {
+//     origin: `http://localhost:${port}`,
+//     methods: ['GET', 'POST'],
+//   },
+// });
+
+// io.on('connection', (socket) => {
+//   console.log(`User connected ${socket.id}`);
+// });

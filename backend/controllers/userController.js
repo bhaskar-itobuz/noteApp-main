@@ -260,3 +260,27 @@ export const logout = async (req, res) => {
     });
   }
 };
+
+
+export const allUser = async (req,res)=>{
+  try{
+    const allUser = await userSchema.find();
+    if(allUser.length === 0){
+      res.json({
+        status: 404,
+        message: "no user found",
+      });
+    }
+    else{
+      res.json({
+        status: 200,
+        message: "find data",allUser
+      });
+    }
+  }catch(e){
+    res.json({
+      status: 404,
+      message: "no user found",
+    });
+  }
+}

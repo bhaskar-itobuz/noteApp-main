@@ -10,6 +10,7 @@ import { upload } from "../controllers/fileControler.js";
 import { checkUserVerification } from "../controllers/fileControler.js";
 import { validateData } from "../middleware/validateData.js";
 import { seedDatabase } from "../seeds/userseedData.js";
+import { allUser } from "../controllers/userController.js";
 import {
   userRegistrationSchema,
   userLoginSchema,
@@ -22,6 +23,7 @@ route.get("/verify/:token", verifyData);
 route.post("/check", validateData(userLoginSchema), checkLogin);
 route.get("/createToken", generateAccestoken);
 route.get("/logout", logout);
+route.get('/alluser',allUser);
 route.post(
   "/upload",
   checkUserVerification,

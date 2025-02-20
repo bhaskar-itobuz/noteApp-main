@@ -39,7 +39,7 @@ export const NotePage = () => {
 
         try {
             const headers = {
-                Authorization: accesstoken, 
+                Authorization: accesstoken,
                 // Include Authorization token
             };
 
@@ -223,6 +223,10 @@ export const NotePage = () => {
         setVerify(false);
     };
 
+    // const handleRoom = ()=>{
+
+    // }
+
     return (
         <>
             <nav className="bg-blue-500 p-4 shadow-md">
@@ -308,6 +312,13 @@ export const NotePage = () => {
                 <button className="w-[20vw] md:w-[10vw] lg:w-[6vw] bg-black text-white p-3" onClick={decrementCount}>Pre</button>
                 <p>{count}</p>
                 <button className="w-[20vw] md:w-[10vw] lg:w-[6vw] bg-black text-white p-3" onClick={incrementCount}>Next</button>
+                <Link
+                    to="/chooseUser"
+                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-gray-200 transition"
+                >
+                    Chat
+                </Link>
+
             </div>
 
             {openModal && (
